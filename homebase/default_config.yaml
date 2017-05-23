@@ -1,0 +1,108 @@
+screen:
+    size: [200, 96]
+text:
+  layout:
+    message:
+      bg: black
+      fg: white
+      font: OpenSans-Bold.ttf
+      maxfontsize: 0.8
+      pos:
+        center: [0.5, 0.5]
+      size: [1.0, 1.0]
+weather:
+  lat: 39
+  lon: -77
+  num_days: 4
+  forecastio:
+    api_key: your_api_key
+    refresh_interval: 1800
+  layout:
+    date:
+      bg: black
+      fg: white
+      font: OpenSans-Bold.ttf
+      pos:
+        centerx: 0.5
+        centery: 0.91667
+      size: [1.0, 0.1667]
+    icon:
+      bg: white
+      fg: black
+      font: meteocons-webfont.ttf
+      pos:
+        centerx: 0.5
+        centery: 0.25
+      size: [1.0, 0.5]
+    temp_min:
+      bg: white
+      fg: black
+      font: OpenSans-Bold.ttf
+      pos:
+        centerx: 0.5
+        centery: 0.75
+      size: [1.0, 0.1667]
+    temp_max:
+      bg: white
+      fg: black
+      font: OpenSans-Bold.ttf
+      pos:
+        centerx: 0.5
+        centery: 0.5833333333333334
+      size: [1.0, 0.1667]
+  icon_map:
+    clear-day: B
+    clear-night: C
+    rain: R
+    snow: W
+    sleet: X
+    wind: F
+    fog: M
+    cloudy: N
+    partly-cloudy-day: H
+    partly-cloudy-night: I
+    hail: X
+    thunderstorm: P
+    default: )
+chromecast:
+  layout:
+    title:
+      bg: black
+      fg: white
+      font: OpenSans-Bold.ttf
+      maxfontsize: 0.75
+      pos:
+        midleft: [0.0, 0.2]
+      size: [1.0, 0.4]
+    artist:
+      bg: white
+      fg: black
+      font: OpenSans-Bold.ttf
+      maxfontsize: 0.75
+      pos:
+        midleft: [0.0, 0.5]
+      size: [1.0, 0.2]
+    album:
+      bg: white
+      fg: black
+      font: OpenSans-Bold.ttf
+      maxfontsize: 0.75
+      pos:
+        midleft: [0.0, 0.7]
+      size: [1.0, 0.2]
+    chromecast:
+      bg: black
+      fg: white
+      font: OpenSans-Bold.ttf
+      maxfontsize: 0.75
+      pos:
+        center: [0.25, 0.9]
+      size: [0.5, 0.2]
+    source:
+      bg: black
+      fg: white
+      font: OpenSans-Bold.ttf
+      maxfontsize: 0.75
+      pos:
+        center: [0.75, 0.9]
+      size: [0.5, 0.2]
