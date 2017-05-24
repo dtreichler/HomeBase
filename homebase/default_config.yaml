@@ -1,3 +1,4 @@
+loglevel: 20
 screen:
     size: [200, 96]
 text:
@@ -70,7 +71,7 @@ chromecast:
       bg: black
       fg: white
       font: OpenSans-Bold.ttf
-      maxfontsize: 0.75
+      maxfontsize: 0.90
       pos:
         midleft: [0.0, 0.2]
       size: [1.0, 0.4]
@@ -78,7 +79,7 @@ chromecast:
       bg: white
       fg: black
       font: OpenSans-Bold.ttf
-      maxfontsize: 0.75
+      maxfontsize: 0.90
       pos:
         midleft: [0.0, 0.5]
       size: [1.0, 0.2]
@@ -86,7 +87,7 @@ chromecast:
       bg: white
       fg: black
       font: OpenSans-Bold.ttf
-      maxfontsize: 0.75
+      maxfontsize: 0.90
       pos:
         midleft: [0.0, 0.7]
       size: [1.0, 0.2]
@@ -94,7 +95,7 @@ chromecast:
       bg: black
       fg: white
       font: OpenSans-Bold.ttf
-      maxfontsize: 0.75
+      maxfontsize: 0.90
       pos:
         center: [0.25, 0.9]
       size: [0.5, 0.2]
@@ -102,7 +103,7 @@ chromecast:
       bg: black
       fg: white
       font: OpenSans-Bold.ttf
-      maxfontsize: 0.75
+      maxfontsize: 0.90
       pos:
         center: [0.75, 0.9]
       size: [0.5, 0.2]
