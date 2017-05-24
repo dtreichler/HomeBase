@@ -1,10 +1,13 @@
 from .homebase import HomeBase
+from .util import surface_to_image
 
 if __name__ == "__main__":
     import pygame
     import time
     import logging
-    
+    from PIL import Image
+    import papirus
+
     from .config import config    
     from .renderer import HomeBaseRenderer
     
@@ -19,11 +22,16 @@ if __name__ == "__main__":
     pygame.init()    
     
     hb = HomeBase(config)
-    screen = pygame.display.set_mode(config['screen']['size'])
+    #screen = pygame.display.set_mode(config['screen']['size'])
+    papirus = papirus.Papirus()
     logger.info('Initializing HomeBase')
     s = hb.render_text('Loading...')
-    screen.blit(s,(0,0))
-    pygame.display.flip()
+    s = surface_to_image(s)
+    papirus.display(s)
+    papirus.update()
+    
+    #screen.blit(s,(0,0))
+    #pygame.display.flip()
 
     running = True
     last_rendered = None
@@ -31,23 +39,31 @@ if __name__ == "__main__":
         while running:                
             if hb.any_playing():
                 s = hb.render_chromecast()
-                screen.blit(s,(0,0))
-                pygame.display.flip()
+                s = surface_to_image(s) 
+                papirus.display(s)
+                if last_rendered is 'chromecast':
+                    papirus.partial_update()
+                else:
+                    papirus.update()
                 last_rendered = 'chromecast'
                 time.sleep(1)
             else:
                 s = hb.render_weather()
-                screen.blit(s,(0,0))
-                pygame.display.flip()
+                s = surface_to_image(s)
+                papirus.display(s)
+                if last_rendered is 'weather':
+                    papirus.partial_update()
+                else:
+                    papirus.update()                
                 last_rendered = 'weather'
                 time.sleep(2)
             
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    s = hb.render_text('Sucka!')
-                    screen.blit(s,(0,0))
-                    pygame.display.flip()
-                    pygame.quit()
-                    running = False
+#            for event in pygame.event.get():
+#                if event.type == pygame.QUIT:
+#                    s = hb.render_text('Sucka!')
+#                    screen.blit(s,(0,0))
+#                    pygame.display.flip()
+#                    pygame.quit()
+#                    running = False
     except KeyboardInterrupt:
-        pygame.quit()
+        papirus.clear()

@@ -15,7 +15,7 @@ weather:
   lon: -77
   num_days: 4
   forecastio:
-    api_key: your_api_key
+    api_key: your_api_key 
     refresh_interval: 1800
   layout:
     date:

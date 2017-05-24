@@ -23,7 +23,7 @@ class HomeBase(object):
     def render_text(self, message):
         s = self.text_renderer.render_screen({'message':message}, self.screen_size)
         return s
-		
+                
     def render_chromecast(self):
         s = self.chromecast_screen.create_surface(self.screen_size)
         return s

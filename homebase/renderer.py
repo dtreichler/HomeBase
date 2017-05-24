@@ -1,6 +1,21 @@
 import pygame
 import copy
 import logging
+import os.path
+
+logger = logging.getLogger('homebase.renderer.get_font')
+
+
+def get_font(fontface, fontsize):
+    if os.path.isfile(fontface):
+        return pygame.font.Font(fontface, fontsize)
+    else:
+        module_font = os.path.join(os.path.dirname(__file__), fonts)
+    try:
+        font = pygame.font.Font(fontface, fontsize)
+    except OSError:
+        font = pygame.font.Font(pygame.font.match_font(fontface), fontsize)
+
 
 class HomeBaseRenderer(object):
     
