@@ -1,4 +1,9 @@
+import pygame
 from .homebase import HomeBase
+
+
+pygame.init()
+
 
 if __name__ == "__main__":
     import pygame

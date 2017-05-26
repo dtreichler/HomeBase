@@ -1,17 +1,29 @@
-from .chromecast import ChromecastScreen
-from .weather import WeatherScreen
-from .renderer import HomeBaseRenderer
+import logging
+import papirus
 
+from .server import ChromecastServer, WeatherServer
+from .renderer import HomeBaseRenderer
+from .util import surface_to_image
 
 class HomeBase(object):
 
     def __init__(self, config):
         self.config = config
+        self.logger = logging.getLogger('homebase.homebase.HomeBase')
         self.screen_size = config['screen']['size']
-        self.chromecast_screen = ChromecastScreen(config['chromecast'])
-        self.weather_screen = WeatherScreen(config['weather'])
-        self.weather_num_days = config['weather']['num_days']
+        self.chromecast_server = ChromecastServer(config['chromecast'], self.screen_size)
+        self.weather_server = WeatherServer(config['weather'], self.screen_size)
         self.text_renderer = HomeBaseRenderer(config['text']['layout'])
+        self._p = papirus.Papirus()
+
+        self.weather_surface = None
+        self.new_weather = False
+        self.chromecast_surface = None
+        self.new_chromecast = False
+
+        self._p.clear()
+        self.chromecast_server.start()
+        self.weather_server.start()
 
     @property
     def screen_width(self):
@@ -21,23 +33,54 @@ class HomeBase(object):
     def screen_height(self):
         return self.screen_size[1]
 
-    def render_text(self, message):
+    def display_text(self, message):
         s = self.text_renderer.render_screen({'message': message}, self.screen_size)
-        return s
-
-    def render_chromecast(self):
-        s = self.chromecast_screen.create_surface(self.screen_size)
-        return s
-
-    def render_weather(self):
-        s = self.weather_screen.create_surface(self.screen_size, self.weather_num_days)
-        return s
+        self.display(s)
 
     def any_playing(self):
-        return self.chromecast_screen.any_playing()
+        return self.chromecast_server.any_playing()
 
-    def render(self):
-        if self.chromecast_screen.any_playing():
-            return self.render_chromecast()
+    def is_idle(self):
+        return True
+
+    def display(self, s, partial=False):
+        self._p.display(surface_to_image(s))
+        if partial:
+            self._p.partial_update()
         else:
-            return self.render_weather()
+            self._p.update()
+
+    def run(self):
+        self.display_text('Starting...')
+        last_displayed = None
+        while True:
+            try:
+                if self.weather_server.new_info.isSet():
+                    self.weather_surface = self.weather_server.q.get()
+                    self.weather_server.new_info.clear()
+                    self.new_weather = True
+                else:
+                    self.new_weather = False
+
+                if self.chromecast_server.new_info.isSet():
+                    self.chromecast_surface = self.chromecast_server.q.get()
+                    self.chromecast_server.new_info.clear()
+                    self.new_chromecast = True
+                else:
+                    self.new_chromecast = False
+
+                if self.is_idle():
+                    if self.any_playing() and self.chromecast_surface is not None:
+                        if last_displayed is 'chromecast' and self.new_chromecast:
+                            self.display(self.chromecast_surface, True)
+                            last_displayed = 'chromecast'
+                        elif last_displayed is 'weather':
+                            self.display(self.chromecast_surface)
+                            last_displayed = 'chromecast'
+                    else:
+                        if last_displayed is not 'weather' or self.new_weather:
+                            self.display(self.weather_surface)
+                            last_displayed = 'weather'
+            except:
+                self.display_text('Stopped')
+                break

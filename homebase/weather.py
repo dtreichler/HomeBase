@@ -35,7 +35,7 @@ class WeatherScreen(object):
             self.last_fio_refresh = datetime.datetime.now()
         return self._forecast
 
-    def get_forecast_info(self):
+    def get_info(self):
         daily = self.forecast.daily()
         for daily_data in daily.data:
             icon = self.icon_map[daily_data.icon]
@@ -58,7 +58,7 @@ class WeatherScreen(object):
         output_surface = pygame.surface.Surface((s_width, s_height))
         output_surface.fill(pygame.Color('white'))
 
-        weather_info = self.get_forecast_info()
+        weather_info = self.get_info()
         for idx, info in enumerate(weather_info):
             img = self.renderer.render_screen(info, (i_width, s_height))
             img_rect = img.get_rect(topleft=(x_offset + i_width * idx, 0))

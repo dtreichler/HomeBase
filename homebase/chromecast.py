@@ -26,7 +26,7 @@ class ChromecastScreen(object):
                 return True
         return False
 
-    def get_media_info(self):
+    def get_info(self):
         for cc in self.chromecasts:
             mc = cc.media_controller
             if mc.is_playing:
@@ -54,9 +54,12 @@ class ChromecastScreen(object):
                 'album': '',
                 'chromecast': '',
                 'source': ''}
-        return info
+        return None
 
     def create_surface(self, size):
-        media_info = self.get_media_info()
+        media_info = self.get_info()
         img = self.renderer.render_screen(media_info, size)
         return img
+
+    def run(self):
+        pass

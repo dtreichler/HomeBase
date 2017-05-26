@@ -1,6 +1,6 @@
 loglevel: 20
-screen:
-    size: [200, 96]
+display:
+    backend: papirus
 text:
   layout:
     message:
