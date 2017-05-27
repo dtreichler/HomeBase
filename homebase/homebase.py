@@ -12,20 +12,24 @@ class HomeBase(object):
     def __init__(self, config):
         self.config = config
         self.logger = logging.getLogger('homebase.homebase.HomeBase')
-        self.screen_size = config['screen']['size']
-        self.chromecast_server = ChromecastServer(config['chromecast'], self.screen_size)
-        self.weather_server = WeatherServer(config['weather'], self.screen_size)
-        self.text_renderer = HomeBaseRenderer(config['text']['layout'])
         self._p = papirus.Papirus()
+        self._p.clear()
 
-        self.weather_surface = None
-        self.new_weather = False
+        self.chromecast_server = ChromecastServer(config['chromecast'], self.screen_size)
         self.chromecast_surface = None
         self.new_chromecast = False
-
-        self._p.clear()
         self.chromecast_server.start()
+
+        self.weather_server = WeatherServer(config['weather'], self.screen_size)
+        self.weather_surface = None
+        self.new_weather = False
         self.weather_server.start()
+
+        self.text_renderer = HomeBaseRenderer(config['text']['layout'])
+
+    @property
+    def screen_size(self):
+        return self._p.size
 
     @property
     def screen_width(self):

@@ -1,6 +1,4 @@
 loglevel: 20
-screen:
-    size: [200, 96]
 text:
   layout:
     message:
