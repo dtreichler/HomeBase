@@ -69,6 +69,12 @@ class HomeBaseRenderer(object):
                     maxfontsize = round(fmt['maxfontsize'] * sz[1])
                 else:
                     maxfontsize = 10000
+
+                if 'minfontsize' in fmt.keys():
+                    minfontsize = round(fmt['minfontsize'] * sz[1])
+                else:
+                    minfontsize = 0
+
                 fontsize = min(round(sz[1]), maxfontsize)
                 max_w = 0.9
                 while True:
@@ -82,6 +88,11 @@ class HomeBaseRenderer(object):
                             fontsize -= 1
                     else:
                         break
+
+                if fontsize < minfontsize:
+                    fontsize = minfontsize
+                    font = pygame.font.Font(fontfile, fontsize)
+
                 self.logger.debug('Using font size {} for {}'.format(fontsize, name))
 
             # Set foreground and background colors
