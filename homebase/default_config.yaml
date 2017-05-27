@@ -16,7 +16,7 @@ weather:
   num_days: 4
   forecastio:
     api_key: your_api_key 
-    refresh_interval: 1800
+    refresh_interval: 7200
   layout:
     date:
       bg: black
