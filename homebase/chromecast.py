@@ -1,16 +1,36 @@
 import pychromecast
 import logging
+import time
+from datetime import datetime
 
 from .renderer import HomeBaseRenderer
+from .server import BaseServer
 
 
-class ChromecastScreen(object):
+class ChromecastServer(BaseServer):
 
-    def __init__(self, config):
-        self.config = config
-        self.renderer = HomeBaseRenderer(config['layout'])
+    def __init__(self, config, screen_size):
         self._chromecasts = None
-        self.logger = logging.getLogger('homebase.chromecast.ChromecastScreen')
+        self.logger = logging.getLogger('homebase.chromecast.ChromecastServer')
+        self.renderer = HomeBaseRenderer(config['layout'])
+        self.screen_size = screen_size
+        super(ChromecastServer, self).__init__()
+
+    def run(self):
+        while not self.stop_request.isSet():
+            if self.any_playing():
+                info = self.get_info()
+                if info != self.last_info:
+                    self.logger.info('New media info: {title} - {artist} - '
+                                     '{album} - {source} - {chromecast}'.format(**info))
+                    with self.q.mutex:
+                        self.q.queue.clear()
+                    s = self.create_surface(info)
+                    self.q.put(s)
+                    self.new_info.set()
+                    self.last_info = info
+                    self.last_time = datetime.now()
+            time.sleep(0.25)
 
     @property
     def chromecasts(self):
@@ -54,12 +74,8 @@ class ChromecastScreen(object):
                 'album': '',
                 'chromecast': '',
                 'source': ''}
-        return None
+        return info
 
-    def create_surface(self, size):
-        media_info = self.get_info()
-        img = self.renderer.render_screen(media_info, size)
+    def create_surface(self, info):
+        img = self.renderer.render_screen(info, self.screen_size)
         return img
-
-    def run(self):
-        pass

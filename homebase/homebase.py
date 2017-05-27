@@ -1,9 +1,11 @@
 import logging
 import papirus
 
-from .server import ChromecastServer, WeatherServer
+from .chromecast import ChromecastServer
+from .weather import WeatherServer
 from .renderer import HomeBaseRenderer
 from .util import surface_to_image
+
 
 class HomeBase(object):
 
@@ -33,13 +35,6 @@ class HomeBase(object):
     def screen_height(self):
         return self.screen_size[1]
 
-    def display_text(self, message):
-        s = self.text_renderer.render_screen({'message': message}, self.screen_size)
-        self.display(s)
-
-    def any_playing(self):
-        return self.chromecast_server.any_playing()
-
     def is_idle(self):
         return True
 
@@ -49,6 +44,10 @@ class HomeBase(object):
             self._p.partial_update()
         else:
             self._p.update()
+
+    def display_text(self, message):
+        s = self.text_renderer.render_screen({'message': message}, self.screen_size)
+        self.display(s)
 
     def run(self):
         self.display_text('Starting...')
@@ -70,7 +69,7 @@ class HomeBase(object):
                     self.new_chromecast = False
 
                 if self.is_idle():
-                    if self.any_playing() and self.chromecast_surface is not None:
+                    if self.chromecast_server.any_playing() and self.chromecast_surface is not None:
                         if last_displayed is 'chromecast' and self.new_chromecast:
                             self.display(self.chromecast_surface, True)
                             last_displayed = 'chromecast'

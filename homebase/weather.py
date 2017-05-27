@@ -1,42 +1,60 @@
-import datetime
+from datetime import datetime
 import forecastio
 import pygame
 import math
 import logging
+import time
 
+from .server import BaseServer
 from .renderer import HomeBaseRenderer
 
 
-class WeatherScreen(object):
+class WeatherServer(BaseServer):
 
-    def __init__(self, config):
+    def __init__(self, config, screen_size):
+        self.logger = logging.getLogger('homebase.weather.WeatherServer')
+        self.screen_size = screen_size
+
         self.config = config
         self.lat = config['lat']
         self.lon = config['lon']
         self.fio_key = config['forecastio']['api_key']
         self.fio_refresh_interval = config['forecastio']['refresh_interval']
         self.icon_map = config['icon_map']
+        self.num_days = config['num_days']
 
         self.renderer = HomeBaseRenderer(config['layout'])
-
         self._forecast = None
-        self.last_fio_refresh = datetime.datetime.now()
+        self.last_fio_refresh = datetime.fromtimestamp(0)
 
-        self.last_screen_refresh = datetime.datetime(2000, 1, 1)
+        super(WeatherServer, self).__init__()
 
-        self.logger = logging.getLogger('homebase.weather.WeatherScreen')
+    def run(self):
+        while not self.stop_request.isSet():
+            info = self.get_info()
+            if info != self.last_info:
+                self.logger.info('Putting new forecast surface')
+                s = self.create_surface(info)
+                with self.q.mutex:
+                    self.q.queue.clear()
+                self.q.put(s)
+                self.new_info.set()
+                self.last_info = info
+                self.last_time = datetime.now()
+            time.sleep(0.25)
 
     @property
     def forecast(self):
-        dt = datetime.datetime.now() - self.last_fio_refresh
+        dt = datetime.now() - self.last_fio_refresh
         if self._forecast is None or dt.total_seconds() > self.fio_refresh_interval:
             self.logger.info('Refreshing forecast')
             self._forecast = forecastio.load_forecast(self.fio_key, self.lat, self.lon)
-            self.last_fio_refresh = datetime.datetime.now()
+            self.last_fio_refresh = datetime.now()
         return self._forecast
 
     def get_info(self):
         daily = self.forecast.daily()
+        info = []
         for daily_data in daily.data:
             icon = self.icon_map[daily_data.icon]
             temp_max = round(daily_data.temperatureMax)
@@ -44,16 +62,17 @@ class WeatherScreen(object):
             temp_min = round(daily_data.temperatureMin)
             temp_min = '{}°'.format(temp_min)
             date = daily_data.time.strftime('%b %d')
-            info = {'temp_min': temp_min,
-                    'temp_max': temp_max,
-                    'date': date,
-                    'icon': icon}
-            yield info
+            info.append({'temp_min': temp_min,
+                         'temp_max': temp_max,
+                         'date': date,
+                         'icon': icon})
+        return info
 
-    def create_surface(self, size, n=4):
-        s_width, s_height = size
-        i_width = math.floor(s_width / n)
-        x_offset = round((s_width - i_width * n) / 2)
+    def create_surface(self, info):
+        n = self.num_days
+        s_width, s_height = tuple(self.screen_size)
+        i_width = math.floor(s_width / self.num_days)
+        x_offset = round((s_width - i_width * self.num_days) / 2)
 
         output_surface = pygame.surface.Surface((s_width, s_height))
         output_surface.fill(pygame.Color('white'))
