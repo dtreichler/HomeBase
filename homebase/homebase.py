@@ -56,6 +56,8 @@ class HomeBase(object):
     def run(self):
         self.display_text('Starting...')
         last_displayed = None
+        n_chromecast = 0
+        n_weather = 0
         while True:
             try:
                 if self.weather_server.new_info.isSet():
@@ -75,11 +77,18 @@ class HomeBase(object):
                 if self.is_idle():
                     if self.chromecast_server.any_playing() and self.chromecast_surface is not None:
                         if last_displayed is 'chromecast' and self.new_chromecast:
-                            self.display(self.chromecast_surface, True)
-                            last_displayed = 'chromecast'
+                            n_chromecast += 1
+                            if n_chromecast > 5:
+                                self.logger.info('Executing full refresh for Chromecast')
+                                partial = False
+                                n_chromecast = 0
+                            else:
+                                partial = True
+                            self.display(self.chromecast_surface, partial)
                         elif last_displayed is 'weather':
                             self.display(self.chromecast_surface)
                             last_displayed = 'chromecast'
+                            n_chromecast = 0
                     else:
                         if last_displayed is not 'weather' or self.new_weather:
                             self.display(self.weather_surface)

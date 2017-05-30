@@ -52,6 +52,8 @@ class ChromecastServer(BaseServer):
             if mc.is_playing:
                 try:
                     artist = mc.status.artist
+                    if artist is None:
+                        artist = mc.status.subtitle
                     title = mc.status.title
                     album = mc.status.album_name
                     source = cc.status.display_name
