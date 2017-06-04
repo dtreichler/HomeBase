@@ -85,14 +85,18 @@ class HomeBase(object):
                             else:
                                 partial = True
                             self.display(self.chromecast_surface, partial)
+                            self.logger.info('Displaying Chromecast.')
                         elif last_displayed is 'weather':
                             self.display(self.chromecast_surface)
                             last_displayed = 'chromecast'
                             n_chromecast = 0
+                            self.logger.info('Displaying Chromecast.')
                     else:
-                        if last_displayed is not 'weather' or self.new_weather:
+                        if (last_displayed is not 'weather' or self.new_weather) and self.weather_surface is not None:
+                            self.logger.info('Displaying weather')
                             self.display(self.weather_surface)
                             last_displayed = 'weather'
             except:
                 self.display_text('Stopped')
+                raise
                 break

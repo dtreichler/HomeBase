@@ -26,6 +26,7 @@ class ChromecastServer(BaseServer):
                     with self.q.mutex:
                         self.q.queue.clear()
                     s = self.create_surface(info)
+                    self.logger.debug('New Chromecast surface {}'.format(s.__repr__()))
                     self.q.put(s)
                     self.new_info.set()
                     self.last_info = info
@@ -37,6 +38,7 @@ class ChromecastServer(BaseServer):
         if self._chromecasts is None:
             self.logger.info('Initializing Chromecasts')
             self._chromecasts = pychromecast.get_chromecasts()
+            self.logger.debug('Chromecasts: {}'.format(self._chromecasts.__repr__()))
         return self._chromecasts
 
     def any_playing(self):
@@ -50,13 +52,13 @@ class ChromecastServer(BaseServer):
         for cc in self.chromecasts:
             mc = cc.media_controller
             if mc.is_playing:
+                source = cc.status.display_name
                 try:
                     artist = mc.status.artist
-                    if artist is None:
+                    if artist is None and hasattr(mc.status, 'subtitle'):
                         artist = mc.status.subtitle
                     title = mc.status.title
                     album = mc.status.album_name
-                    source = cc.status.display_name
                     info = {'artist': ' ' if artist is None else ' ' + artist,
                             'title': ' ' if title is None else ' ' + title,
                             'album': ' ' if album is None else ' ' + album,

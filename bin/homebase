@@ -2,13 +2,16 @@
 
 from homebase import HomeBase, config
 import logging
+import signal
+
+def sigterm_handler(_signo, _stack_frame):
+    sys.exit(0)
 
 if __name__ == "__main__":
-
+    signal.signal(signal.SIGTERM, sigterm_handler)
     logger = logging.getLogger('homebase')
     logger.setLevel(config['loglevel'])
     ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     ch.setFormatter(formatter)
     logger.addHandler(ch)

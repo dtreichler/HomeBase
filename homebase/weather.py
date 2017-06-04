@@ -37,6 +37,7 @@ class WeatherServer(BaseServer):
                 s = self.create_surface(info)
                 with self.q.mutex:
                     self.q.queue.clear()
+                self.logger.debug('New weather surface: {}'.format(s.__repr__()))
                 self.q.put(s)
                 self.new_info.set()
                 self.last_info = info
