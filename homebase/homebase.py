@@ -3,6 +3,7 @@ import papirus
 
 from .chromecast import ChromecastServer
 from .weather import WeatherServer
+from .buttons import ButtonServer
 from .renderer import HomeBaseRenderer
 from .util import surface_to_image
 
@@ -24,6 +25,9 @@ class HomeBase(object):
         self.weather_surface = None
         self.new_weather = False
         self.weather_server.start()
+
+        self.button_server = ButtonServer()
+        self.button_server.start()
 
         self.text_renderer = HomeBaseRenderer(config['text']['layout'])
 
