@@ -22,6 +22,7 @@ class WeatherServer(BaseServer):
         self.fio_refresh_interval = config['forecastio']['refresh_interval']
         self.icon_map = config['icon_map']
         self.num_days = config['num_days']
+        self.date_fmt = config['date_fmt']
 
         self.renderer = HomeBaseRenderer(config['layout'])
         self._forecast = None
@@ -62,7 +63,7 @@ class WeatherServer(BaseServer):
             temp_max = '{}°'.format(temp_max)
             temp_min = round(daily_data.temperatureMin)
             temp_min = '{}°'.format(temp_min)
-            date = daily_data.time.strftime('%b %d')
+            date = daily_data.time.strftime(self.date_fmt)
             info.append({'temp_min': temp_min,
                          'temp_max': temp_max,
                          'date': date,
